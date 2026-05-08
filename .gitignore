@@ -21,8 +21,3 @@ screenshots
 
 # 环境变量（包含敏感信息）
 .env
-
-# 发布脚本
-publish.sh
-
-# 本地 MCP Server 数据目录
