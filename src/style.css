@@ -6,14 +6,14 @@
   --color-bg-tertiary: #eef0ee;
   --color-text: #1a1e1b;
   --color-text-secondary: #505856;
-  --color-text-tertiary: #848e89;
+  --color-text-tertiary: #6b7570;
   --color-border: rgba(66, 184, 131, 0.25);
   --color-border-light: rgba(66, 184, 131, 0.15);
   --color-accent: #42b883;
   --color-accent-hover: #359d6e;
   --color-accent-bg: rgba(66, 184, 131, 0.1);
   --color-accent-subtle: rgba(66, 184, 131, 0.04);
-  --color-link: #38a876;
+  --color-link: #2e8b65;
   --color-code-bg: rgba(66, 184, 131, 0.07);
   --color-code-border: transparent;
   --color-pre-bg: #ffffff;
@@ -30,10 +30,33 @@
   --color-error-border: #ff8182;
   --color-shadow: rgba(26, 60, 40, 0.05);
   --color-overlay: rgba(0, 0, 0, 0.95);
-  --color-scrollbar: #c8d0ca;
-  --color-scrollbar-hover: #a0ada3;
+  --color-scrollbar: #c1c5c3;
+  --color-scrollbar-hover: #a0a5a2;
   --color-success: #1a7f37;
   --color-success-bg: #dafbe1;
+  --color-warning-text: #9a6700;
+  --color-warning-bg: #fff8c5;
+  --color-info-text: #0969da;
+  --color-info-bg: #ddf4ff;
+
+  /* 过渡 */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Z-index 层级 */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-sidebar: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-tooltip: 600;
+  --z-toast: 700;
 }
 
 /* ===== 基础重置 ===== */
@@ -45,11 +68,11 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 1.65;
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 #app {
@@ -245,7 +268,7 @@ body {
 
 .markdown-content {
   width: 100%;
-  max-width: 960px;
+  max-width: 780px;
   margin: 0 auto;
   background: var(--color-bg);
   padding: 24px 20px;
@@ -1878,7 +1901,7 @@ body {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  max-width: 960px;
+  max-width: 780px;
   margin: 0 auto;
   padding: 8px 32px 0;
 }
@@ -1921,7 +1944,7 @@ body {
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  max-width: 960px;
+  max-width: 780px;
   margin: 0 auto;
   padding: 20px 32px 32px;
 }
@@ -3602,7 +3625,7 @@ body {
   align-items: center;
   gap: 6px;
   width: 100%;
-  max-width: 960px;
+  max-width: 780px;
   margin: 0 auto;
   padding: 12px 32px 24px;
   font-size: 12px;
