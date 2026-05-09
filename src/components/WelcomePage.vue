@@ -23,11 +23,11 @@
         </button>
       </div>
       <!-- GitHub -->
-      <a class="welcome-github" href="https://github.com/xiaoyaodev/md2ui" target="_blank">
+      <a class="welcome-github" href="https://github.com/ooaaaa/md2ui" target="_blank">
         <GitHubIcon :size="16" />
         <span>GitHub</span>
         <span class="welcome-github-sep"></span>
-        <span class="welcome-github-repo">xiaoyaodev/md2ui</span>
+        <span class="welcome-github-repo">ooaaaa/md2ui</span>
         <ExternalLink :size="12" class="welcome-github-arrow" />
       </a>
     </div>
