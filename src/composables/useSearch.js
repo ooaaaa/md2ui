@@ -43,24 +43,30 @@ export function useSearch() {
 
     const docs = flattenDocs(pendingDocsList)
 
-    // 并发加载所有文档内容，大幅提升索引构建速度
-    const documents = (await Promise.all(
-      docs.map(async (doc) => {
-        try {
-          const response = await fetch(doc.path)
-          if (!response.ok) return null
-          const content = await response.text()
-          return {
-            id: doc.key,
-            title: doc.label,
-            content: content.replace(/^---[\s\S]*?---\n?/, ''), // 去掉 frontmatter
-            path: doc.path
+    // 并发加载文档内容，最多同时 10 个请求，每篇取前 5000 字符构建索引
+    const CONCURRENT_LIMIT = 10
+    const documents = []
+    for (let i = 0; i < docs.length; i += CONCURRENT_LIMIT) {
+      const batch = docs.slice(i, i + CONCURRENT_LIMIT)
+      const results = await Promise.all(
+        batch.map(async (doc) => {
+          try {
+            const response = await fetch(doc.path)
+            if (!response.ok) return null
+            const content = await response.text()
+            return {
+              id: doc.key,
+              title: doc.label,
+              content: content.replace(/^---[\s\S]*?---\n?/, '').substring(0, 5000),
+              path: doc.path
+            }
+          } catch {
+            return null
           }
-        } catch {
-          return null // 忽略加载失败的文档
-        }
-      })
-    )).filter(Boolean)
+        })
+      )
+      documents.push(...results.filter(Boolean))
+    }
 
     searchIndex = new MiniSearch({
       fields: ['title', 'content'],

@@ -6,7 +6,10 @@ import {
   ExternalHyperlink, TableLayoutType,
   convertInchesToTwip
 } from 'docx'
-// 使用原生方式下载文件，兼容 Chrome / Safari / Firefox
+
+// ===== 常量 =====
+const MAX_EXPORT_WIDTH_PX = 576
+
 // 使用原生方式下载文件，兼容 Chrome / Safari / Firefox
 function downloadBlob(blob, fileName) {
   // 将 Blob 包装为 File 对象，Chrome 会从 File.name 获取文件名
@@ -428,7 +431,7 @@ async function parseDomToDocx(contentEl) {
             bytes[i] = binaryString.charCodeAt(i)
           }
           // 限制最大宽度为 6 英寸（Word 页面宽度约 6.5 英寸）
-          const maxWidth = 6 * 96 // 576px
+          const maxWidth = MAX_EXPORT_WIDTH_PX
           const scale = width > maxWidth ? maxWidth / width : 1
           const imgWidth = Math.round(width * scale)
           const imgHeight = Math.round(height * scale)
@@ -595,7 +598,7 @@ async function fetchImageAsBytes(src) {
       img.onerror = reject
       img.src = src
     })
-    const maxWidth = 576
+    const maxWidth = MAX_EXPORT_WIDTH_PX
     const scale = img.naturalWidth > maxWidth ? maxWidth / img.naturalWidth : 1
     const w = Math.round(img.naturalWidth * scale)
     const h = Math.round(img.naturalHeight * scale)

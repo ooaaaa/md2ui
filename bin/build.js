@@ -17,6 +17,9 @@ import { pathToFileURL } from 'url'
 import { marked } from 'marked'
 import hljs from 'highlight.js'
 import GithubSlugger from 'github-slugger'
+import { docHash, resolveDocKey, findDocInTree } from '../src/composables/useDocHash.js'
+import { parseFrontmatter, calcReadingTime } from '../src/composables/useFrontmatter.js'
+import { flattenDocsList } from '../src/composables/useDocTree.js'
 
 let katex
 try {
@@ -44,40 +47,6 @@ const defaultConfig = {
 }
 
 // ===== 工具函数 =====
-
-// base62 字符集（与 useMarkdown.js 保持一致）
-const BASE62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-function fnv1a64(str) {
-  let h1 = 0x811c9dc5 >>> 0
-  for (let i = 0; i < str.length; i++) {
-    h1 ^= str.charCodeAt(i)
-    h1 = Math.imul(h1, 0x01000193) >>> 0
-  }
-  let h2 = 0x050c5d1f >>> 0
-  for (let i = 0; i < str.length; i++) {
-    h2 ^= str.charCodeAt(i)
-    h2 = Math.imul(h2, 0x01000193) >>> 0
-  }
-  return [h1, h2]
-}
-
-function toBase62(h1, h2) {
-  const num = (BigInt(h1) << 32n) | BigInt(h2)
-  let n = num
-  let result = ''
-  while (n > 0n && result.length < 12) {
-    result = BASE62[Number(n % 62n)] + result
-    n = n / 62n
-  }
-  return result.padStart(8, '0').slice(0, 8)
-}
-
-function docHash(key) {
-  const [h1, h2] = fnv1a64(key)
-  return toBase62(h1, h2)
-}
-
 
 // 加载用户配置文件
 async function loadUserConfig() {
@@ -147,51 +116,12 @@ function scanDocs(dir, basePath = '', level = 0, folderExpanded = false) {
   return items
 }
 
-// 扁平化文档树
-function flattenDocs(items, result = []) {
-  for (const item of items) {
-    if (item.type === 'file') result.push(item)
-    if (item.type === 'folder' && item.children) flattenDocs(item.children, result)
-  }
-  return result
-}
-
-// 解析 YAML frontmatter
-function parseFrontmatter(markdown) {
-  const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/)
-  if (!match) return { data: {}, content: markdown }
-  const yamlStr = match[1]
-  const data = {}
-  for (const line of yamlStr.split('\n')) {
-    const m = line.match(/^(\w+)\s*:\s*(.+)$/)
-    if (!m) continue
-    let val = m[2].trim()
-    if (val === 'true') val = true
-    else if (val === 'false') val = false
-    else if (/^\d+$/.test(val)) val = parseInt(val)
-    else val = val.replace(/^['"]|['"]$/g, '')
-    data[m[1]] = val
-  }
-  return { data, content: markdown.slice(match[0].length) }
-}
-
-// 计算阅读时间
-function calcReadingTime(markdown) {
-  const clean = markdown
-    .replace(/^---[\s\S]*?---\n?/, '')
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/[#*_~`>\-|[\]()!]/g, '')
-  const cnChars = (clean.match(/[\u4e00-\u9fff]/g) || []).length
-  const enWords = clean.replace(/[\u4e00-\u9fff]/g, '').split(/\s+/).filter(w => w.length > 0).length
-  const totalChars = cnChars + enWords
-  const minutes = Math.ceil(cnChars / 400 + enWords / 200)
-  return { totalChars, minutes: Math.max(1, minutes) }
-}
-
 // ===== Markdown 渲染（SSG 版本，使用 marked + hljs，不含 Mermaid 客户端渲染） =====
 
-async function renderMarkdownToHtml(markdown, currentDocKey, docsList) {
+// 已复制的图片文件集合（避免重复复制）
+const _copiedImages = new Set()
+
+async function renderMarkdownToHtml(markdown, currentDocKey, docsList, docSourceDir) {
   const { data: frontmatter, content } = parseFrontmatter(markdown)
   const slugger = new GithubSlugger()
   const renderer = new marked.Renderer()
@@ -259,6 +189,30 @@ async function renderMarkdownToHtml(markdown, currentDocKey, docsList) {
     return `<a href="${href}"${titleAttr} target="_blank" rel="noopener">${text}</a>`
   }
 
+  // 图片渲染（SSG 版本：相对路径解析 + 复制图片到输出目录）
+  renderer.image = function(href, title, text) {
+    if (href && !/^(https?:|data:|\/|@)/.test(href) && docSourceDir) {
+      // 相对路径图片，解析为绝对路径
+      const srcPath = resolve(docSourceDir, href)
+      if (fs.existsSync(srcPath)) {
+        // 复制图片到输出目录（保持相对路径结构）
+        const imgRelativeInDocs = href.replace(/^\.\//, '')
+        const destPath = resolve(outDir, imgRelativeInDocs)
+        if (!_copiedImages.has(srcPath)) {
+          const destDir = dirname(destPath)
+          if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true })
+          fs.copyFileSync(srcPath, destPath)
+          _copiedImages.add(srcPath)
+        }
+        // 输出路径改为相对于 HTML 文件（都在 dist/ 根目录）
+        href = '/' + imgRelativeInDocs
+      }
+    }
+    const alt = text || ''
+    const titleAttr = title ? ` title="${title}"` : ''
+    return `<img src="${href}" alt="${alt}"${titleAttr} class="zoomable-image" />`
+  }
+
   marked.setOptions({ renderer, breaks: true, gfm: true, headerIds: false, mangle: false })
 
   // 注册 KaTeX 数学公式扩展
@@ -318,32 +272,6 @@ async function renderMarkdownToHtml(markdown, currentDocKey, docsList) {
   }
 
   return { html, frontmatter, title: frontmatter.title || '' }
-}
-
-// 解析相对路径
-function resolveDocKey(href, currentDocKey) {
-  const currentParts = currentDocKey.split('/')
-  currentParts.pop()
-  const linkParts = href.replace(/\.md$/, '').split('/')
-  const resolved = [...currentParts]
-  for (const part of linkParts) {
-    if (part === '.' || part === '') continue
-    if (part === '..') { resolved.pop(); continue }
-    resolved.push(part)
-  }
-  return resolved.join('/')
-}
-
-// 在文档树中查找文档
-function findDocInTree(items, key) {
-  for (const item of items) {
-    if (item.type === 'file' && item.key === key) return item
-    if (item.type === 'folder' && item.children) {
-      const found = findDocInTree(item.children, key)
-      if (found) return found
-    }
-  }
-  return null
 }
 
 // 生成搜索索引 JSON
@@ -450,7 +378,6 @@ function generatePageHtml(options) {
       <div class="logo">
         <div class="logo-group">
           <a href="/index.html" class="logo-link">${siteTitle}</a>
-        </div>
         </div>
       </div>
       <nav class="nav-menu">
@@ -595,7 +522,7 @@ async function build() {
 
   // 扫描文档
   const docsList = scanDocs(scanDir, '', 0, siteConfig.folderExpanded)
-  const flatDocs = flattenDocs(docsList)
+  const flatDocs = flattenDocsList(docsList)
 
   if (flatDocs.length === 0) {
     console.log('  当前目录下没有找到 Markdown 文件\n')
@@ -624,7 +551,8 @@ async function build() {
   for (let i = 0; i < flatDocs.length; i++) {
     const doc = flatDocs[i]
     const markdown = fs.readFileSync(doc.path, 'utf-8')
-    const { html: contentHtml, title, frontmatter } = await renderMarkdownToHtml(markdown, doc.key, docsList)
+    const docSourceDir = dirname(doc.path)
+    const { html: contentHtml, title, frontmatter } = await renderMarkdownToHtml(markdown, doc.key, docsList, docSourceDir)
     const sidebarHtml = renderSidebarHtml(docsList, doc.key)
     const docNavHtml = renderDocNav(flatDocs, i)
     const hash = docHash(doc.key)

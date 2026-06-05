@@ -34,7 +34,9 @@ export async function fetchDocsList() {
       _listEtag = res.headers.get('etag')
       return pruneEmpty(await res.json())
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    console.warn('获取文档列表失败:', e.message)
+  }
   return []
 }
 
@@ -52,7 +54,9 @@ export async function pollDocsList() {
       _listEtag = res.headers.get('etag')
       return pruneEmpty(await res.json())
     }
-  } catch { /* 静默忽略 */ }
+  } catch (e) {
+    console.warn('轮询文档列表失败:', e.message)
+  }
   return null
 }
 
@@ -78,7 +82,9 @@ export async function pollDocContent(docPath) {
       _contentEtag = res.headers.get('etag')
       return await res.text()
     }
-  } catch { /* 静默忽略 */ }
+  } catch (e) {
+    console.warn('轮询文档内容失败:', e.message)
+  }
   return null
 }
 

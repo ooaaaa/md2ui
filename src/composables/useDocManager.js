@@ -8,8 +8,12 @@ import { findDoc, findFirstDoc, findReadmeDoc, findDocByHash, expandParents, fla
 import { stripOrderPrefix } from './useDocHash.js'
 import { clearMermaidCache } from './useMermaidCache.js'
 
+// ===== 常量 =====
+const IMAGE_LOAD_TIMEOUT_MS = 3000
+const HASH_SYNC_DELAY_MS = 100
+
 // 等待内容区域图片加载完成
-async function waitForContentImages(timeoutMs = 3000) {
+async function waitForContentImages(timeoutMs = IMAGE_LOAD_TIMEOUT_MS) {
   const images = document.querySelectorAll('.markdown-content img')
   const pending = [...images].filter(img => !img.complete)
   if (!pending.length) return
@@ -90,7 +94,7 @@ export function useDocManager() {
       } else {
         history.replaceState(makeState(), '', url)
       }
-    }, 100)
+    }, HASH_SYNC_DELAY_MS)
   })
 
   function handleScroll(e) {
@@ -365,8 +369,12 @@ export function useDocManager() {
 
   // ===== 轮询回调（供 useFileWatcher 调用） =====
 
-  // 树结构指纹，快速判断是否有变化
+  // 树结构指纹，快速判断是否有变化（缓存上次结果）
+  let _lastFingerprint = ''
+  let _lastTreeRef = null
   function treeFingerprint(items) {
+    // 引用相同则直接返回缓存
+    if (items === _lastTreeRef && _lastFingerprint) return _lastFingerprint
     const parts = []
     for (const item of items) {
       parts.push(item.key)
@@ -374,7 +382,9 @@ export function useDocManager() {
         parts.push('{', treeFingerprint(item.children), '}')
       }
     }
-    return parts.join(',')
+    _lastFingerprint = parts.join(',')
+    _lastTreeRef = items
+    return _lastFingerprint
   }
 
   function getExpandedKeys(items) {

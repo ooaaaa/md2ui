@@ -30,7 +30,7 @@ export function useFileWatcher({ getCurrentDocPath, onDocsListChange, onDocConte
   function start() {
     if (watching.value) return
     watching.value = true
-    timer = setInterval(poll, 500)
+    timer = setInterval(poll, 1500)
   }
 
   function stop() {
