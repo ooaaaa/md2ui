@@ -12,7 +12,6 @@ import { fileURLToPath } from 'url'
 import { dirname, resolve } from 'path'
 import fs from 'fs'
 import crypto from 'crypto'
-import { exec } from 'child_process'
 import { pathToFileURL } from 'url'
 
 // 获取 CLI 工具所在目录
@@ -283,7 +282,8 @@ async function start() {
       md2uiPlugin(siteConfig, scanDir)
     ],
     server: {
-      port: siteConfig.port
+      port: siteConfig.port,
+      open: true
     },
     optimizeDeps: {
       include: ['vue', 'marked', 'mermaid']
@@ -298,12 +298,6 @@ async function start() {
   }
   console.log('')
 
-  // 自动打开浏览器
-  const address = server.httpServer.address()
-  const url = `http://localhost:${address.port}`
-  const platform = process.platform
-  const cmd = platform === 'darwin' ? 'open' : platform === 'win32' ? 'start' : 'xdg-open'
-  exec(`${cmd} ${url}`)
 }
 
 start().catch(console.error)

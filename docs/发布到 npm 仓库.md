@@ -1,9 +1,13 @@
 # 发布到 npm 仓库
 
 常用命令：
+```shell
+# 先修改package.json的version字段，然后执行发布命令
+npm login 
+npm publish 
+# 会跳转浏览器登录npm官网然后手工二次验证mac指纹验证
 
-bash publish.sh patch
-
+```
 
 
 ## 前置准备

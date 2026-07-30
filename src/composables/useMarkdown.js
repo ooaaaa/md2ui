@@ -22,7 +22,7 @@ function ensureMermaid() {
   mermaid.initialize({
     startOnLoad: false,
     theme: 'base',
-    securityLevel: 'sandbox',
+    securityLevel: 'strict',
     themeVariables: {
       primaryColor: '#e8eaf6',
       primaryTextColor: '#37474f',

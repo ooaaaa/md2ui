@@ -410,7 +410,7 @@ function generateWelcomeHtml(siteTitle) {
   </div>`
 }
 
-// 内联 JS：主题切换 + 侧边栏折叠 + 代码复制 + Mermaid 延迟渲染
+// 内联 JS：侧边栏折叠 + 代码复制 + 图片放大 + Mermaid 延迟渲染
 function getInlineScript() {
   return `
 // 侧边栏折叠
@@ -435,11 +435,37 @@ var sidebar=document.getElementById('sidebar'),overlay=document.getElementById('
 function openDrawer(){if(sidebar){sidebar.classList.add('drawer-open');if(overlay)overlay.style.display='block'}}
 function closeDrawer(){if(sidebar){sidebar.classList.remove('drawer-open');if(overlay)overlay.style.display='none'}}
 
+// 图片点击放大（事件委托同时支持异步渲染的 Mermaid）
+(function(){
+var items=[],index=0,scale=1,offsetX=0,offsetY=0,dragging=false,startX=0,startY=0,startOffsetX=0,startOffsetY=0;
+var overlay=document.createElement('div');
+overlay.className='ssg-image-zoom-overlay';
+overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-hidden','true');
+overlay.innerHTML='<div class="ssg-image-zoom-toolbar"><button type="button" data-action="zoom-in" title="放大">＋</button><button type="button" data-action="zoom-out" title="缩小">−</button><button type="button" data-action="reset" title="重置">1:1</button><span class="ssg-image-zoom-level">100%</span><span class="ssg-image-zoom-counter"></span><button type="button" data-action="close" title="关闭">×</button></div><button type="button" class="ssg-image-zoom-nav ssg-image-zoom-prev" data-action="prev" title="上一张">‹</button><div class="ssg-image-zoom-stage"><div class="ssg-image-zoom-view"></div></div><button type="button" class="ssg-image-zoom-nav ssg-image-zoom-next" data-action="next" title="下一张">›</button>';
+document.body.appendChild(overlay);
+var stage=overlay.querySelector('.ssg-image-zoom-stage'),view=overlay.querySelector('.ssg-image-zoom-view');
+var level=overlay.querySelector('.ssg-image-zoom-level'),counter=overlay.querySelector('.ssg-image-zoom-counter');
+var prev=overlay.querySelector('.ssg-image-zoom-prev'),next=overlay.querySelector('.ssg-image-zoom-next');
+function updateTransform(){view.style.transform='translate('+offsetX+'px,'+offsetY+'px) scale('+scale+')';level.textContent=Math.round(scale*100)+'%'}
+function reset(){scale=1;offsetX=0;offsetY=0;updateTransform()}
+function render(){var source=items[index];if(!source)return;var clone=source.cloneNode(true);clone.classList.remove('zoomable-image');clone.style.cursor='grab';view.replaceChildren(clone);counter.textContent=items.length>1?(index+1)+' / '+items.length:'';prev.hidden=items.length<2;next.hidden=items.length<2;prev.disabled=index===0;next.disabled=index===items.length-1;reset()}
+function open(source){items=Array.prototype.slice.call(document.querySelectorAll('.markdown-content .zoomable-image'));index=Math.max(0,items.indexOf(source));overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');document.body.classList.add('ssg-zoom-open');render();overlay.querySelector('[data-action="close"]').focus()}
+function close(){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');document.body.classList.remove('ssg-zoom-open');view.replaceChildren();reset()}
+function change(step){var nextIndex=index+step;if(nextIndex<0||nextIndex>=items.length)return;index=nextIndex;render()}
+document.addEventListener('click',function(event){var source=event.target.closest&&event.target.closest('.markdown-content .zoomable-image');if(!source)return;event.preventDefault();open(source)});
+overlay.addEventListener('click',function(event){var action=event.target.closest('[data-action]');if(action){event.stopPropagation();if(action.dataset.action==='zoom-in'){scale=Math.min(10,scale+.2);updateTransform()}else if(action.dataset.action==='zoom-out'){scale=Math.max(.1,scale-.2);updateTransform()}else if(action.dataset.action==='reset')reset();else if(action.dataset.action==='prev')change(-1);else if(action.dataset.action==='next')change(1);else if(action.dataset.action==='close')close();return}if(event.target===overlay||event.target===stage)close()});
+overlay.addEventListener('wheel',function(event){if(!overlay.classList.contains('open'))return;event.preventDefault();scale=Math.max(.1,Math.min(10,scale*(event.deltaY>0?.9:1.1)));updateTransform()},{passive:false});
+view.addEventListener('pointerdown',function(event){if(event.button!==0)return;dragging=true;startX=event.clientX;startY=event.clientY;startOffsetX=offsetX;startOffsetY=offsetY;view.setPointerCapture(event.pointerId);event.preventDefault()});
+view.addEventListener('pointermove',function(event){if(!dragging)return;offsetX=startOffsetX+event.clientX-startX;offsetY=startOffsetY+event.clientY-startY;updateTransform()});
+view.addEventListener('pointerup',function(){dragging=false});view.addEventListener('pointercancel',function(){dragging=false});
+document.addEventListener('keydown',function(event){if(!overlay.classList.contains('open'))return;if(event.key==='Escape')close();else if(event.key==='ArrowLeft')change(-1);else if(event.key==='ArrowRight')change(1);else if(event.key==='+'||event.key==='='){scale=Math.min(10,scale+.2);updateTransform()}else if(event.key==='-'){scale=Math.max(.1,scale-.2);updateTransform()}else if(event.key==='0')reset()});
+})();
+
 // Mermaid 延迟渲染
 (function(){var els=document.querySelectorAll('.mermaid');
 if(els.length===0)return;
 var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
-s.onload=function(){mermaid.initialize({startOnLoad:false,theme:'base',themeVariables:{primaryColor:'#e8eaf6',primaryTextColor:'#37474f',primaryBorderColor:'#7986cb',lineColor:'#90a4ae',textColor:'#455a64',secondaryColor:'#f3e5f5',secondaryBorderColor:'#ba68c8',tertiaryColor:'#e0f7fa',tertiaryBorderColor:'#4dd0e1',fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif',fontSize:'14px',actorBkg:'#e8eaf6',actorBorder:'#7986cb',signalColor:'#5c6bc0',sectionBkgColor:'#e8eaf6',altSectionBkgColor:'#f3e5f5',taskBkgColor:'#7986cb',taskTextColor:'#ffffff',activeTaskBkgColor:'#5c6bc0',doneTaskBkgColor:'#9fa8da',pie1:'#7986cb',pie2:'#ba68c8',pie3:'#4dd0e1',pie4:'#ffb74d',pie5:'#a1887f',mainBkg:'#e8eaf6',background:'#ffffff'}});
+s.onload=function(){mermaid.initialize({startOnLoad:false,theme:'base',securityLevel:'strict',themeVariables:{primaryColor:'#e8eaf6',primaryTextColor:'#37474f',primaryBorderColor:'#7986cb',lineColor:'#90a4ae',textColor:'#455a64',secondaryColor:'#f3e5f5',secondaryBorderColor:'#ba68c8',tertiaryColor:'#e0f7fa',tertiaryBorderColor:'#4dd0e1',fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif',fontSize:'14px',actorBkg:'#e8eaf6',actorBorder:'#7986cb',signalColor:'#5c6bc0',sectionBkgColor:'#e8eaf6',altSectionBkgColor:'#f3e5f5',taskBkgColor:'#7986cb',taskTextColor:'#ffffff',activeTaskBkgColor:'#5c6bc0',doneTaskBkgColor:'#9fa8da',pie1:'#7986cb',pie2:'#ba68c8',pie3:'#4dd0e1',pie4:'#ffb74d',pie5:'#a1887f',mainBkg:'#e8eaf6',background:'#ffffff'}});
 els.forEach(function(el){var id=el.id;var code=el.textContent;
 mermaid.render(id+'-svg',code).then(function(r){el.innerHTML=r.svg;el.classList.add('zoomable-image');el.style.cursor='zoom-in'})
 .catch(function(e){el.innerHTML='<pre class=\"mermaid-error\">图表渲染失败\\n'+e.message+'</pre>'})})};
@@ -485,6 +511,49 @@ function getSsgCss(pkgRoot) {
   border: none; padding: 0; margin: 0;
 }
 .ssg-page .welcome-desc { font-size: 16px; color: var(--color-text-secondary); margin: 0; }
+/* SSG 图片放大 */
+.markdown-content .zoomable-image { cursor: zoom-in; }
+body.ssg-zoom-open { overflow: hidden; }
+.ssg-image-zoom-overlay {
+  position: fixed; inset: 0; z-index: 10000; display: none;
+  align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.95);
+}
+.ssg-image-zoom-overlay.open { display: flex; }
+.ssg-image-zoom-stage {
+  position: absolute; inset: 0; display: flex; align-items: center;
+  justify-content: center; overflow: hidden;
+}
+.ssg-image-zoom-view {
+  position: relative; z-index: 1; padding: 16px; border-radius: 8px;
+  background: rgba(255, 255, 255, 0.98); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  cursor: grab; touch-action: none; transform-origin: center; transition: transform 0.12s ease-out;
+}
+.ssg-image-zoom-view:active { cursor: grabbing; }
+.ssg-image-zoom-view img { display: block; max-width: 85vw; max-height: 80vh; object-fit: contain; }
+.ssg-image-zoom-view svg { display: block; max-width: 85vw; max-height: 80vh; background: #fff; }
+.ssg-image-zoom-toolbar {
+  position: absolute; top: 20px; right: 20px; z-index: 3; display: flex;
+  align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.95);
+}
+.ssg-image-zoom-toolbar button, .ssg-image-zoom-nav {
+  border: 0; border-radius: 4px; background: transparent; color: #374151; cursor: pointer;
+}
+.ssg-image-zoom-toolbar button { min-width: 32px; height: 32px; padding: 0 6px; font-size: 16px; }
+.ssg-image-zoom-toolbar button:hover { background: #eef0ee; }
+.ssg-image-zoom-level, .ssg-image-zoom-counter { min-width: 44px; color: #4b5563; font-size: 12px; text-align: center; }
+.ssg-image-zoom-nav {
+  position: absolute; top: 50%; z-index: 3; width: 44px; height: 44px;
+  transform: translateY(-50%); border-radius: 50%; background: rgba(255, 255, 255, 0.9); font-size: 32px;
+}
+.ssg-image-zoom-nav:disabled { cursor: not-allowed; opacity: 0.3; }
+.ssg-image-zoom-prev { left: 20px; }
+.ssg-image-zoom-next { right: 20px; }
+@media (max-width: 768px) {
+  .ssg-image-zoom-toolbar { top: 12px; right: 12px; left: 12px; justify-content: center; }
+  .ssg-image-zoom-prev { left: 8px; } .ssg-image-zoom-next { right: 8px; }
+  .ssg-image-zoom-view img, .ssg-image-zoom-view svg { max-width: 90vw; max-height: 75vh; }
+}
+
 /* 移动端响应式 */
 @media (max-width: 768px) {
   .ssg-page .sidebar {

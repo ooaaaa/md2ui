@@ -18,7 +18,11 @@ pnpm-lock.yaml
 
 # 截图目录
 screenshots
+.playwright-cli
 
 # 环境变量（包含敏感信息）
 .env
 npm.env
+
+# 临时文件
+tmp
