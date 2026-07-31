@@ -43,8 +43,8 @@
 <script setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import mermaid from 'mermaid'
 import { getMermaidCache, setMermaidCache } from '../composables/useMermaidCache.js'
+import { renderMermaidSvg } from '../utils/mermaidRenderer.js'
 
 const props = defineProps(nodeViewProps)
 
@@ -73,7 +73,7 @@ async function renderChart() {
   }
   try {
     const id = 'mermaid-editor-' + Math.random().toString(36).substr(2, 9)
-    const { svg } = await mermaid.render(id, text)
+    const svg = await renderMermaidSvg(id, text)
     svgContent.value = svg
     renderError.value = false
     // 写入缓存

@@ -1,6 +1,5 @@
 import { ref, nextTick } from 'vue'
 import { marked } from 'marked'
-import mermaid from 'mermaid'
 import GithubSlugger from 'github-slugger'
 import hljs from 'highlight.js'
 import katex from 'katex'
@@ -13,56 +12,7 @@ const lineNumbersReady = (typeof window !== 'undefined')
   : Promise.resolve()
 import { parseFrontmatter, calcReadingTime } from './useFrontmatter.js'
 import { docHash, resolveDocKey, findDocInTree } from './useDocHash.js'
-
-// Mermaid 懒初始化：首次渲染时才 initialize
-let mermaidInitialized = false
-function ensureMermaid() {
-  if (mermaidInitialized) return
-  mermaidInitialized = true
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: 'base',
-    securityLevel: 'strict',
-    themeVariables: {
-      primaryColor: '#e8eaf6',
-      primaryTextColor: '#37474f',
-      primaryBorderColor: '#7986cb',
-      lineColor: '#90a4ae',
-      textColor: '#455a64',
-      secondaryColor: '#f3e5f5',
-      secondaryBorderColor: '#ba68c8',
-      secondaryTextColor: '#4a148c',
-      tertiaryColor: '#e0f7fa',
-      tertiaryBorderColor: '#4dd0e1',
-      tertiaryTextColor: '#006064',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      fontSize: '14px',
-      nodeBorder: '#7986cb',
-      nodeTextColor: '#37474f',
-      actorBkg: '#e8eaf6',
-      actorBorder: '#7986cb',
-      actorTextColor: '#37474f',
-      signalColor: '#5c6bc0',
-      signalTextColor: '#37474f',
-      sectionBkgColor: '#e8eaf6',
-      altSectionBkgColor: '#f3e5f5',
-      taskBkgColor: '#7986cb',
-      taskTextColor: '#ffffff',
-      activeTaskBkgColor: '#5c6bc0',
-      doneTaskBkgColor: '#9fa8da',
-      pie1: '#7986cb',
-      pie2: '#ba68c8',
-      pie3: '#4dd0e1',
-      pie4: '#ffb74d',
-      pie5: '#a1887f',
-      classText: '#37474f',
-      labelColor: '#37474f',
-      mainBkg: '#e8eaf6',
-      nodeBkg: '#e8eaf6',
-      background: '#ffffff',
-    }
-  })
-}
+import { ensureMermaid, renderMermaidSvg } from '../utils/mermaidRenderer.js'
 
 // 创建自定义渲染器，处理链接、标题锚点和 Mermaid
 function createRenderer(currentDocKey, docsList) {
@@ -255,8 +205,7 @@ async function renderMermaid() {
       // 优先使用缓存
       let svg = getMermaidCache(code)
       if (!svg) {
-        const result = await mermaid.render(id + '-svg', code)
-        svg = result.svg
+        svg = await renderMermaidSvg(id + '-svg', code)
         setMermaidCache(code, svg)
       }
       element.innerHTML = svg
