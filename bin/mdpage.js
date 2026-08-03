@@ -26,6 +26,7 @@ const userDir = process.cwd()
 const defaultConfig = {
   title: 'mdpage',
   port: 3000,
+  open: true,
   folderExpanded: false,
   github: '',
   footer: '',
@@ -283,7 +284,7 @@ async function start() {
     ],
     server: {
       port: siteConfig.port,
-      open: true
+      open: siteConfig.open
     },
     optimizeDeps: {
       include: ['vue', 'marked', 'mermaid']
