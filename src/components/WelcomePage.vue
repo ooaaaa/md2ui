@@ -11,7 +11,7 @@
             <line x1="10" y1="22" x2="17" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </div>
-        <h1 class="welcome-title">mdpage</h1>
+        <h1 class="welcome-title">md2page</h1>
       </div>
       <p class="welcome-desc">将 Markdown 文档转换为美观易读的网页</p>
       <!-- 操作区 -->
@@ -23,11 +23,11 @@
         </button>
       </div>
       <!-- GitHub -->
-      <a href="https://github.com/ooaaaa/mdpage" target="_blank" class="welcome-github" >
+      <a href="https://github.com/ooaaaa/md2page" target="_blank" class="welcome-github" >
         <GitHubIcon :size="16" />
         <span>GitHub</span>
         <span class="welcome-github-sep"></span>
-        <span class="welcome-github-repo">ooaaaa/mdpage</span>
+        <span class="welcome-github-repo">ooaaaa/md2page</span>
         <ExternalLink :size="12" class="welcome-github-arrow" />
       </a>
     </div>

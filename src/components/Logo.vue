@@ -6,7 +6,7 @@
       <line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       <line x1="8" y1="16" x2="13" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
     </svg>
-    <span class="logo-text">mdpage</span>
+    <span class="logo-text">md2page</span>
   </div>
 </template>
 

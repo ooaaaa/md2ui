@@ -1,19 +1,19 @@
 # CLI 工具
 
-验证 mdpage 命令行工具的各项功能。
+验证 md2page 命令行工具的各项功能。
 
 ## 基本用法
 
 ```bash
 # 在文档目录下启动预览
 cd /path/to/your/docs
-mdpage
+md2page
 
 # 指定端口
-mdpage -p 8080
+md2page -p 8080
 
 # 静态构建
-mdpage build
+md2page build
 ```
 
 ## 启动流程
@@ -29,8 +29,8 @@ CLI 按以下顺序查找配置文件：
 
 | 优先级 | 文件名 | 格式 |
 |--------|--------|------|
-| 1 | `mdpage.config.js` | ES Module |
-| 2 | `.mdpagerc.json` | JSON |
+| 1 | `md2page.config.js` | ES Module |
+| 2 | `.md2pagerc.json` | JSON |
 
 命令行参数优先级最高，会覆盖配置文件中的同名配置。
 
@@ -46,7 +46,7 @@ CLI 按以下顺序查找配置文件：
 
 ## 验证要点
 
-1. 在包含 .md 文件的目录下运行 `mdpage` 应启动服务
+1. 在包含 .md 文件的目录下运行 `md2page` 应启动服务
 2. 无 .md 文件时应提示错误并退出
 3. `-p` 参数应正确设置端口
 4. 配置文件应被正确加载

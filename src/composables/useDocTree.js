@@ -13,7 +13,7 @@ export function buildHashIndex(items, docHashFn) {
     if (_hashIndex.has(hash)) {
       const existing = _hashIndex.get(hash)
       console.warn(
-        `[mdpage] hash 碰撞检测：「${doc.key}」与「${existing.key}」生成了相同的 hash「${hash}」，` +
+        `[md2page] hash 碰撞检测：「${doc.key}」与「${existing.key}」生成了相同的 hash「${hash}」，` +
         '后者将被覆盖。请考虑重命名其中一个文档。'
       )
     }

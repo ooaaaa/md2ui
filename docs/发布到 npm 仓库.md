@@ -91,14 +91,14 @@ npm version major
 
 ```bash
 # 全局安装
-npm install -g mdpage
+npm install -g md2page
 
 # 在包含 .md 文件的目录下运行
 cd /path/to/your/docs
-mdpage
+md2page
 
 # 指定端口
-mdpage -p 3000
+md2page -p 3000
 ```
 
 ## 常见问题
@@ -113,7 +113,7 @@ mdpage -p 3000
 
 ```json
 {
-  "name": "@your-username/mdpage"
+  "name": "@your-username/md2page"
 }
 ```
 
@@ -126,5 +126,5 @@ npm publish --access public
 用户安装：
 
 ```bash
-npm install -g @your-username/mdpage
+npm install -g @your-username/md2page
 ```

@@ -1,12 +1,12 @@
-# mdpage
+# md2page
 
-[![npm version](https://img.shields.io/npm/v/mdpage)](https://www.npmjs.com/package/mdpage)
-[![GitHub](https://img.shields.io/badge/GitHub-ooaaaa%2Fmdpage-blue?logo=github)](https://github.com/ooaaaa/mdpage)
+[![npm version](https://img.shields.io/npm/v/md2page)](https://www.npmjs.com/package/md2page)
+[![GitHub](https://img.shields.io/badge/GitHub-ooaaaa%2Fmd2page-blue?logo=github)](https://github.com/ooaaaa/md2page)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 一行命令，将本地 Markdown 文件转换为可预览、可编辑、可搜索的文档站点。
 
-## 为什么需要 mdpage？
+## 为什么需要 md2page？
 
 AI 编程时代，与 AI 协作会产生大量 Markdown 文档 —— 需求文档、设计方案、API 文档、技术调研……这些 `.md` 文件散落在项目各处：
 
@@ -15,13 +15,13 @@ AI 编程时代，与 AI 协作会产生大量 Markdown 文档 —— 需求文�
 - 想快速改几个字，还得切回编辑器找到对应文件
 - 文档之间缺乏导航关系，无法形成知识体系
 
-mdpage 把它指向你的文档目录，立刻获得一个功能完整的文档站点。
+md2page 把它指向你的文档目录，立刻获得一个功能完整的文档站点。
 
 ## 核心能力
 
 | 能力 | 说明 |
 |------|------|
-| 零配置启动 | `cd docs && mdpage`，开箱即用 |
+| 零配置启动 | `cd docs && md2page`，开箱即用 |
 | 实时预览 | 文件变更自动刷新，所见即所得 |
 | 在线编辑 | 内置富文本编辑器，浏览器中修改并保存到本地 |
 | 全文搜索 | 基于 MiniSearch，毫秒级检索 |
@@ -30,7 +30,7 @@ mdpage 把它指向你的文档目录，立刻获得一个功能完整的文档�
 | Markdown 增强 | GFM、代码高亮、Mermaid 图表、数学公式、Frontmatter |
 | 移动端适配 | 响应式布局，手机端舒适阅读 |
 | 阅读体验 | 进度条、预计阅读时间、上下篇导航、图片放大 |
-| SSG 构建 | `mdpage build` 生成纯静态站点 |
+| SSG 构建 | `md2page build` 生成纯静态站点 |
 | 自定义配置 | 站点标题、主题色、GitHub 链接、页脚等 |
 
 ## 界面预览
@@ -50,13 +50,13 @@ mdpage 把它指向你的文档目录，立刻获得一个功能完整的文档�
 ### 安装
 
 ```bash
-npm install -g mdpage
+npm install -g md2page
 ```
 
 或免安装直接运行：
 
 ```bash
-npx mdpage
+npx md2page
 ```
 
 ### 使用
@@ -65,19 +65,19 @@ npx mdpage
 
 ```bash
 cd /path/to/your/docs
-mdpage
+md2page
 ```
 
 访问 `http://localhost:3000` 查看文档。`-p` 指定端口：
 
 ```bash
-mdpage -p 8080
+md2page -p 8080
 ```
 
 ### 静态构建
 
 ```bash
-mdpage build
+md2page build
 ```
 
 生成的静态文件在 `dist/` 目录下，可部署到 Nginx、GitHub Pages、Vercel 等任意静态托管服务。
@@ -100,7 +100,7 @@ your-docs/
 
 ## 自定义配置
 
-在文档目录下创建 `mdpage.config.js`：
+在文档目录下创建 `md2page.config.js`：
 
 ```js
 export default {
@@ -115,7 +115,7 @@ export default {
 
 | 配置项 | 类型 | 默认值 | 说明 |
 |--------|------|--------|------|
-| title | string | `'mdpage'` | 站点标题 |
+| title | string | `'md2page'` | 站点标题 |
 | port | number | `3000` | 开发服务器端口 |
 | folderExpanded | boolean | `false` | 文件夹默认展开 |
 | themeColor | string | `'#3eaf7c'` | 主题色 |
@@ -126,14 +126,14 @@ export default {
 
 - **AI 辅助开发** — 用 AI 生成的需求文档、设计方案统一管理，即时预览和编辑
 - **个人知识库** — 日常笔记、学习记录丢进文件夹，自动组织成可浏览的站点
-- **项目文档站** — API 文档、部署指南，`mdpage build` 一键构建静态站点
+- **项目文档站** — API 文档、部署指南，`md2page build` 一键构建静态站点
 - **团队协作** — 配合 Git 管理文档版本，提交后自动构建部署
 
 ## 开发
 
 ```bash
-git clone https://github.com/ooaaaa/mdpage.git
-cd mdpage
+git clone https://github.com/ooaaaa/md2page.git
+cd md2page
 pnpm install
 pnpm dev
 ```
@@ -141,9 +141,9 @@ pnpm dev
 ### 项目结构
 
 ```
-mdpage/
+md2page/
 ├── bin/                   # CLI 入口
-│   ├── mdpage.js           # dev server
+│   ├── md2page.js           # dev server
 │   └── build.js           # SSG 静态构建
 ├── src/
 │   ├── App.vue            # 主组件

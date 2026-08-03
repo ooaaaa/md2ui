@@ -24,7 +24,7 @@ sequenceDiagram
     participant V as Vite Server
     participant B as 浏览器
 
-    U->>C: mdpage
+    U->>C: md2page
     C->>V: 启动开发服务器
     V->>V: 扫描 .md 文件
     V-->>C: 服务就绪
