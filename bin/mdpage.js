@@ -24,7 +24,7 @@ const userDir = process.cwd()
 
 // 默认配置
 const defaultConfig = {
-  title: 'md2ui',
+  title: 'mdpage',
   port: 3000,
   folderExpanded: false,
   github: '',
@@ -32,25 +32,25 @@ const defaultConfig = {
   themeColor: '#3eaf7c'
 }
 
-// 加载用户配置文件（md2ui.config.js 或 .md2uirc.json）
+// 加载用户配置文件（mdpage.config.js 或 .mdpagerc.json）
 async function loadUserConfig() {
-  // 尝试 md2ui.config.js
-  const jsPath = resolve(userDir, 'md2ui.config.js')
+  // 尝试 mdpage.config.js
+  const jsPath = resolve(userDir, 'mdpage.config.js')
   if (fs.existsSync(jsPath)) {
     try {
       const mod = await import(pathToFileURL(jsPath).href)
-      console.log('  配置文件: md2ui.config.js\n')
+      console.log('  配置文件: mdpage.config.js\n')
       return mod.default || mod
     } catch (e) {
       console.warn('  配置文件加载失败:', e.message, '\n')
     }
   }
-  // 尝试 .md2uirc.json
-  const jsonPath = resolve(userDir, '.md2uirc.json')
+  // 尝试 .mdpagerc.json
+  const jsonPath = resolve(userDir, '.mdpagerc.json')
   if (fs.existsSync(jsonPath)) {
     try {
       const raw = fs.readFileSync(jsonPath, 'utf-8')
-      console.log('  配置文件: .md2uirc.json\n')
+      console.log('  配置文件: .mdpagerc.json\n')
       return JSON.parse(raw)
     } catch (e) {
       console.warn('  配置文件加载失败:', e.message, '\n')
@@ -133,9 +133,9 @@ function hasMdFiles(dir) {
 }
 
 // Vite 插件：提供用户文档 API + 配置 API + 热更新
-function md2uiPlugin(siteConfig, docsRoot) {
+function mdpagePlugin(siteConfig, docsRoot) {
   return {
-    name: 'md2ui-server',
+    name: 'mdpage-server',
     configureServer(server) {
       // API 中间件
       server.middlewares.use((req, res, next) => {
@@ -260,7 +260,7 @@ async function start() {
   const cliArgs = parseArgs()
   const scanDir = cliArgs.dir ? resolve(userDir, cliArgs.dir) : userDir
 
-  console.log(`\n  md2ui - Markdown 文档预览工具\n`)
+  console.log(`\n  mdpage - Markdown 文档预览工具\n`)
   console.log(`  扫描目录: ${scanDir}\n`)
 
   if (!hasMdFiles(scanDir)) {
@@ -279,7 +279,7 @@ async function start() {
     configFile: false,
     plugins: [
       (await import('@vitejs/plugin-vue')).default(),
-      md2uiPlugin(siteConfig, scanDir)
+      mdpagePlugin(siteConfig, scanDir)
     ],
     server: {
       port: siteConfig.port,

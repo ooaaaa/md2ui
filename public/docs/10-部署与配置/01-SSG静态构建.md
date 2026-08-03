@@ -1,11 +1,11 @@
 # SSG 静态构建
 
-验证 `md2ui build` 静态站点生成功能。
+验证 `mdpage build` 静态站点生成功能。
 
 ## 使用方式
 
 ```bash
-md2ui build
+mdpage build
 ```
 
 ## 构建产物
@@ -38,7 +38,7 @@ dist/
 
 ## 验证要点
 
-1. 运行 `md2ui build` 应在 dist 目录生成静态文件
+1. 运行 `mdpage build` 应在 dist 目录生成静态文件
 2. 用静态服务器打开 dist/index.html 应正常显示
 3. 文档导航和内容加载应正常工作
 4. URL 路由应正确解析

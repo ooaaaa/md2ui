@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * md2ui build - SSG 静态构建
+ * mdpage build - SSG 静态构建
  * 
  * 流程：
  * 1. 先执行 vite build 生成 SPA 产物
@@ -37,7 +37,7 @@ const userDir = process.cwd()
 
 // 默认配置
 const defaultConfig = {
-  title: 'md2ui',
+  title: 'mdpage',
   port: 3000,
   folderExpanded: false,
   github: '',
@@ -50,7 +50,7 @@ const defaultConfig = {
 
 // 加载用户配置文件
 async function loadUserConfig() {
-  const jsPath = resolve(userDir, 'md2ui.config.js')
+  const jsPath = resolve(userDir, 'mdpage.config.js')
   if (fs.existsSync(jsPath)) {
     try {
       const mod = await import(pathToFileURL(jsPath).href)
@@ -59,7 +59,7 @@ async function loadUserConfig() {
       console.warn('  配置文件加载失败:', e.message)
     }
   }
-  const jsonPath = resolve(userDir, '.md2uirc.json')
+  const jsonPath = resolve(userDir, '.mdpagerc.json')
   if (fs.existsSync(jsonPath)) {
     try {
       return JSON.parse(fs.readFileSync(jsonPath, 'utf-8'))
@@ -70,7 +70,7 @@ async function loadUserConfig() {
   return {}
 }
 
-// 扫描目录下的 md 文件（与 md2ui.js 保持一致）
+// 扫描目录下的 md 文件（与 mdpage.js 保持一致）
 function scanDocs(dir, basePath = '', level = 0, folderExpanded = false) {
   const items = []
   if (!fs.existsSync(dir)) return items
@@ -570,7 +570,7 @@ body.ssg-zoom-open { overflow: hidden; }
 
 // ===== 主构建流程 =====
 async function build() {
-  // 解析位置参数：md2ui build [dir]
+  // 解析位置参数：mdpage build [dir]
   const args = process.argv.slice(3)
   let targetDir = null
   for (const arg of args) {
@@ -581,7 +581,7 @@ async function build() {
   }
   const scanDir = targetDir ? resolve(userDir, targetDir) : userDir
 
-  console.log('\n  md2ui build - 静态站点生成\n')
+  console.log('\n  mdpage build - 静态站点生成\n')
   console.log(`  扫描目录: ${scanDir}\n`)
 
   // 加载配置

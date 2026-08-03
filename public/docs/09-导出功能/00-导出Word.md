@@ -57,7 +57,7 @@
 
 ```javascript
 function hello() {
-  console.log('Hello, md2ui!')
+  console.log('Hello, mdpage!')
 }
 ```
 

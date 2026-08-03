@@ -91,14 +91,14 @@ npm version major
 
 ```bash
 # 全局安装
-npm install -g md2ui
+npm install -g mdpage
 
 # 在包含 .md 文件的目录下运行
 cd /path/to/your/docs
-md2ui
+mdpage
 
 # 指定端口
-md2ui -p 3000
+mdpage -p 3000
 ```
 
 ## 常见问题
@@ -113,7 +113,7 @@ md2ui -p 3000
 
 ```json
 {
-  "name": "@your-username/md2ui"
+  "name": "@your-username/mdpage"
 }
 ```
 
@@ -126,5 +126,5 @@ npm publish --access public
 用户安装：
 
 ```bash
-npm install -g @your-username/md2ui
+npm install -g @your-username/mdpage
 ```

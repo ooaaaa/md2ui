@@ -92,7 +92,7 @@
         </button>
       </div>
       <span class="top-bar-divider"></span>
-      <a href="https://github.com/ooaaaa/md2ui" target="_blank" class="top-bar-github" title="GitHub">
+      <a href="https://github.com/ooaaaa/mdpage" target="_blank" class="top-bar-github" title="GitHub">
         <Github :size="15" />
       </a>
     </div>

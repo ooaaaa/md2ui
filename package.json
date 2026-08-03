@@ -1,5 +1,5 @@
 {
-  "name": "md2ui",
+  "name": "mdpage",
   "version": "2.0.1",
   "type": "module",
   "description": "将本地 Markdown 文档转换为美观的 HTML 页面",
@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ooaaaa/md2ui.git"
+    "url": "git+https://github.com/ooaaaa/mdpage.git"
   },
   "keywords": [
     "markdown",
@@ -17,7 +17,7 @@
     "vue"
   ],
   "bin": {
-    "md2ui": "bin/md2ui.js"
+    "mdpage": "bin/mdpage.js"
   },
   "scripts": {
     "dev": "vite",

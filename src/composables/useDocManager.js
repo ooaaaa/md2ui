@@ -123,7 +123,7 @@ export function useDocManager() {
     editMode.value = false
     lastModified.value = ''
     sessionStorage.setItem('editMode', 'false')
-    document.title = 'md2ui'
+    document.title = 'mdpage'
     if (!isPopstate) {
       history.replaceState(makeState(), '', window.location.href)
       history.pushState(makeState(0), '', '/')
@@ -178,7 +178,7 @@ export function useDocManager() {
         if (contentEl) contentEl.scrollTop = 0
         // 动态更新页面标题（SEO + 浏览器标签页）
         const docTitle = findDoc(docsList.value, key)?.label || ''
-        document.title = docTitle ? `${docTitle} - md2ui` : 'md2ui'
+        document.title = docTitle ? `${docTitle} - mdpage` : 'mdpage'
       }
     } catch (error) {
       console.error('加载文档失败:', error)
